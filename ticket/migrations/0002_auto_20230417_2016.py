@@ -4,15 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('ticket', '0001_initial'),
+        ("ticket", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='tickettype',
-            name='quantity',
-            field=models.PositiveIntegerField(default=1, editable=False, help_text='The number of actual tickets available upon creation'),
+            model_name="tickettype",
+            name="quantity",
+            field=models.PositiveIntegerField(
+                default=1, editable=False, help_text="The number of actual tickets available upon creation"
+            ),
         ),
     ]
