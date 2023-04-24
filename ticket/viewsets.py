@@ -23,7 +23,7 @@ class OrderViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         if not order.fulfilled:
             order.delete()
             raise exceptions.ValidationError("Couldn't book tickets")
-        
+
     def perform_cancellation(self, serializer):
         order = serializer.save(user=self.request.user)
         order.cancel_tickets()
