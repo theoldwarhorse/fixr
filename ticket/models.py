@@ -1,5 +1,7 @@
 from django.db import models, transaction
 from django.conf import settings
+from datetime import datetime, timedelta
+
 
 
 class Event(models.Model):
@@ -36,6 +38,8 @@ class Order(models.Model):
     ticket_type = models.ForeignKey(TicketType, related_name="orders", on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     fulfilled = models.BooleanField(default=False)
+    fulfilled_at = models.DateTimeField(default=datetime.now, blank=True)
+    cancelled = models.BooleanField(default=False)final
 
     def book_tickets(self):
         if self.fulfilled:
@@ -44,6 +48,24 @@ class Order(models.Model):
         try:
             with transaction.atomic():
                 updated_count = self.ticket_type.tickets.filter(id__in=qs).update(order=self)
+                if updated_count != self.quantity:
+                    raise Exception
+        except Exception:
+            return
+        self.fulfilled = True
+        self.save(update_fields=["fulfilled"])
+
+    def cancel_order(self):
+        if self.cancelled:
+            raise Exception("Order already cancelled")
+
+        if datetime.now - self.fulfilled_at > timedelta(minutes=order_cancellation_threshold):
+            raise Exception("Orders can only be cancelled within half an hour of their booking")
+
+        qs = Ticket.objects.filter(order=self)
+        try:
+            with transaction.atomic():
+                updated_count = self.ticket_type.tickets.filter(id__in=qs).update(order=None)
                 if updated_count != self.quantity:
                     raise Exception
         except Exception:
